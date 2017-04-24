@@ -2,7 +2,7 @@
 	pakmirrors
 
 # Website:
-	[SourceForge](https://pakmirrors.sourceforge.io/ "SourceForge")	
+	https://pakmirrors.sourceforge.io/
 
 # Short description:
 	Archlinux's pacman mirrors sorter
@@ -15,7 +15,7 @@
 		to remember the syntax, and without user iteration.
 
 # Based upon:
-	* [ArchWiki](https://wiki.archlinux.org/index.php/mirrors#List_by_speed/ "ArchWiki")
+	* https://wiki.archlinux.org/index.php/mirrors#List_by_speed/
 	* Archlinux's pacman rankmirrors utility
 
 # Copyright 2017:
