@@ -3,7 +3,7 @@
 ---
 
 ### Website:
-	https://pakmirrors.sourceforge.io/
+	[SourceForge](http://pakmirrors.sourceforge.io)
 
 ### Short description:
 	Archlinux's pacman mirrors sorter
