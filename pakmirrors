@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+# pakmirrors
+#
+# Based upon https://wiki.archlinux.org/index.php/mirrors#List_by_speed
+#
+# Website: https://pakmirrors.sourceforge.io/
+#
+# Copyright 2017 speedytux@posteo.net, gnuman@posteo.eu
+# License GPL-3
+#
+
+PROGNAME="pakmirrors"   # Executable name
+DIR="/etc/pacman.d"             # Archlinux's pacman directory path
+LIST=$DIR"/mirrorlist"           # Archlinux's pacman mirrorlist path
+DEBUG="DEBUG:"                   # Debug string
+
+# Set verbose output for debug purpose
+VERBOSE=no
+[[ $1 = "-v" ]] && VERBOSE=yes
+
+# Stop if the user haven't admin privileges
+[[ $EUID -ne 0 ]] && { echo $PROGNAME": This script must be run as root"; exit 1; }
+[[ $VERBOSE = "yes" ]] && echo $DEBUG "You are root!"
+
+##
+## Check for archlinux derivative or choose a different notification in that case
+##
+# Stop if the distribution is not archlinux
+[[ ! -e $DIR ]] && { echo $PROGNAME": This script must be run only in Archlinux"; exit 1; }
+[[ $VERBOSE = "yes" ]] && echo $DEBUG "You are using Archlinux!"
+
+# Back up the current mirrorlist
+if [[ -e $LIST ]]; then
+  BACKUP=$LIST.backup
+  [[ -e $BACKUP ]] && rm $BACKUP
+  mv $LIST $BACKUP || { echo $PROGNAME': Backup failed' ; exit 1; }
+  [[ $VERBOSE = "yes" ]]  && echo $DEBUG "I have backuped and removed the current mirrorlist!"
+fi
+
+# Move the mirrorlist.pacnew
+PACNEW=$LIST.pacnew
+if [[ -e $PACNEW ]]; then
+  mv $PACNEW $LIST || { echo $PROGNAME': Moving from pacnew failed' ; exit 1; }
+  [[ $VERBOSE = "yes" ]] && echo $DEBUG "I have upgraded from pacnew!"
+else # Or download a clean one
+  echo $PROGNAME": Please wait until I retrive the fresh mirrorlist..."
+  curl -s https://www.archlinux.org/mirrorlist/all/https/ -o $LIST || { echo $PROGNAME': Retriving the fresh mirrorlist failed. Maybe a network problem?' ; exit 1; }
+  [[ $VERBOSE = "yes" ]] && echo $DEBUG "I retrived the new mirrorlist!"
+fi
+
+##
+## Create in /tmp memory the working mirrorlist
+##
+# Create the working mirrorlist
+WORK=$LIST.$PROGNAME
+[[ -e $WORK ]] && rm $WORK
+cp $LIST $WORK || { echo $PROGNAME': Creating the working file failed' ; exit 1; }
+[[ $VERBOSE = "yes" ]] && echo $DEBUG "I created the new working file!"
+
+# Uncomment every mirror
+sed -i 's/^#Server/Server/' $WORK || { echo $PROGNAME': Uncommenting failed' ; exit 1; }
+[[ $VERBOSE = "yes" ]]  && echo $DEBUG "I uncommented!"
+
+# Rank the mirrors with output the 6 fatest mirrors
+echo $PROGNAME": Please wait for the ranking..."
+rankmirrors -n 6 $WORK > $LIST
+[[ $VERBOSE = "yes" ]]  && echo $DEBUG "I ranked the mirrors!"
+rm $WORK
+[[ $VERBOSE = "yes" ]]  && echo $DEBUG "I removed the working file!"
+
+# Show the resulting mirrorlist
+[[ $VERBOSE = "yes" ]]  && echo $DEBUG ">> This is the new mirrorlist >>"
+
+grep -v "^#" $LIST || { echo $PROGNAME': Reporting failed' ; exit 1; }
+
+##
+# cat $LIST
+# sed '/^$\|^#/d' $LIST || { echo $PROGNAME': Reporting failed' ; exit 1; }
+##
+
+# Return with no errors
+exit 0
