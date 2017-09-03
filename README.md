@@ -35,4 +35,4 @@ GNU General Public License version 3.0 (GPLv3)
 * Propose the package to an archlinux's Trusted User to include in AUR
 
 ### Tested on:
-Archlinux updated on April 24, 2017
+Archlinux updated on September 3, 2017
