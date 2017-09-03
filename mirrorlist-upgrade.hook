@@ -1,0 +1,12 @@
+# Based upon the Archlinux Wiki page https://wiki.archlinux.org/index.php/Reflector#Pacman_Hook
+
+[Trigger]
+Operation = Upgrade
+Type = Package
+Target = pacman-mirrorlist
+
+[Action]
+Description = Updating pacman-mirrorlist with pakmirrors and removing pacnew and backup...
+When = PostTransaction
+Depends = pacman # and on pakmirrors
+Exec = /usr/bin/env sh -c "pakmirrors; if [[ -f /etc/pacman.d/mirrorlist.pacnew ]]; then rm /etc/pacman.d/mirrorlist.pacnew; fi; if [[ -f /etc/pacman.d/mirrorlist.backup ]]; then rm /etc/pacman.d/mirrorlist.backup; fi"
