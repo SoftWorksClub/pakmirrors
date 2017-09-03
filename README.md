@@ -24,6 +24,7 @@ The purpose was to have a just works command line tool without the need to remem
 GNU General Public License version 3.0 (GPLv3)
 
 ### ToDo:
+* Add a pacman hook to execute pakmirrors on pacman-mirrorlist upgrade
 * Divide in functions
 * Add the version for the actual revision
 * Add the help ( -h or --help ) command line option
